@@ -1,7 +1,10 @@
 
-##require drug chemical similarity data as AD1, target sequence similarity data 
-##as AT1, and drug-target association data as B.
-combinedsimilarity <- function(B, AD1, AT1, gamad1, gamad2, gamat1, gamat2, m, n) {
+#########build network-based network########
+#by incorporating new similarity matrice in terms of shared common targets/drugs
+#into drug and target network matrix respectively.
+#require drug chemical similarity data as AD1, target sequence similarity data 
+#as AT1, and drug-target association data as B.
+combinedsimilarity <- function(B, AD1, AT1, gamad1,gamat1,m, n) {
   # Initialize AD2 (drug-drug similarity based on common targets
   AD2 <- diag(rowSums(t(B)))  # t(B) because drugs are columns
   
@@ -53,15 +56,17 @@ combinedsimilarity <- function(B, AD1, AT1, gamad1, gamad2, gamat1, gamat2, m, n
   }
 
   # Combine similarities
-  AD <- (gamad1 *AD1 + gamad2 * NAD2) / (gamad1 + gamad2)
-  AT <- (gamat1 * AT1 + gamat2 * NAT2) / (gamat1 + gamat2)
+  AD <- (gamad1 *AD1 + (1-gamad1) * NAD2) 
+  AT <- (gamat1 * AT1 + (1-gamat1) * NAT2)
   
   return(list(AD = AD, AT = AT))
 }
 
 
-#####this function was built for the prediction
-nrwrhdrugtarget <- function(backprobability, lanbuda, yita, gamad1, gamad2, gamat1, gamat2, drugID) {
+
+#########For prediction#########
+#it calls the previously built function to generate network-based network
+nrwrhdrugtarget <- function(backprobability,lanbuda,yita,gamad1,gamat1,drugID) {
   # Load data
   B<-as.matrix(read.table("code/example/interaction.txt"))
   AT1 <- as.matrix(read.table("code/example/sequencesimilarity.txt"))
@@ -74,7 +79,7 @@ adj=as.data.frame(B)
   m <- ncol(B)  # number of drugs
   
   #call previously built function to standardize drug and target own similarity matrix
-  sim_list <- combinedsimilarity(B, AD1, AT1, gamad1, gamad2, gamat1, gamat2, m, n)
+  sim_list <- combinedsimilarity(B, AD1, AT1, gamad1,gamat1, m, n)
   AD <- sim_list$AD
   AT <- sim_list$AT
   
