@@ -1,8 +1,7 @@
 
-
 #########For leave-one-out cross validation#########
 #compare fold enrichment with RWRH
-valid <- function(backprobability,lanbuda,yita,gamad1,gamat1) {
+valid <- function(backprobability,lambda,eta,gamad1,gamat1) {
   # Load data
   B<-as.matrix(read.table("code/example/interaction.txt"))
   AT1 <- as.matrix(read.table("code/example/sequencesimilarity.txt"))
@@ -48,14 +47,14 @@ valid <- function(backprobability,lanbuda,yita,gamad1,gamat1) {
         for (i in 1:n) {
           row_sum <- sum(B_mask[i, ])
           if (row_sum != 0) {
-            MTD[i, ] <- lanbuda * B_mask[i, ] / row_sum
+            MTD[i, ] <- lambda * B_mask[i, ] / row_sum
           }
         }
         
         for (i in 1:m) {
           col_sum <- sum(B_mask[, i])
           if (col_sum != 0) {
-            MDT[i, ] <- lanbuda * B_mask[, i] / col_sum
+            MDT[i, ] <- lambda * B_mask[, i] / col_sum
           }
         }
         
@@ -64,7 +63,7 @@ valid <- function(backprobability,lanbuda,yita,gamad1,gamat1) {
           if (sum(B_mask[i, ]) == 0 && row_sum != 0) {
             MT[i, ] <- AT[i, ] / row_sum
           } else if (row_sum != 0) {
-            MT[i, ] <- (1 - lanbuda) * AT[i, ] / row_sum
+            MT[i, ] <- (1 - lambda) * AT[i, ] / row_sum
           }
         }
         
@@ -73,7 +72,7 @@ valid <- function(backprobability,lanbuda,yita,gamad1,gamat1) {
           if (sum(B_mask[, i]) == 0 && row_sum != 0) {
             MD[i, ] <- AD[i, ] / row_sum
           } else if (row_sum != 0) {
-            MD[i, ] <- (1 - lanbuda) * AD[i, ] / row_sum
+            MD[i, ] <- (1 - lambda) * AD[i, ] / row_sum
           }
         }
         
@@ -93,7 +92,7 @@ valid <- function(backprobability,lanbuda,yita,gamad1,gamat1) {
           if (sum(B_mask[i, ]) == 0 && row_sum != 0) {
             MT_rwrh[i, ] <- AT1[i, ] / row_sum
           } else if (row_sum != 0) {
-            MT_rwrh[i, ] <- (1 - lanbuda) * AT1[i, ] / row_sum
+            MT_rwrh[i, ] <- (1 - lambda) * AT1[i, ] / row_sum
           }
         }
         for (i in 1:m) {
@@ -101,7 +100,7 @@ valid <- function(backprobability,lanbuda,yita,gamad1,gamat1) {
           if (sum(B_mask[, i]) == 0 && row_sum != 0) {
             MD_rwrh[i, ] <- AD1[i, ] / row_sum
           } else if (row_sum != 0) {
-            MD_rwrh[i, ] <- (1 - lanbuda) * AD1[i, ] / row_sum
+            MD_rwrh[i, ] <- (1 - lambda) * AD1[i, ] / row_sum
           }
         }
         M1_rwrh <- cbind(MT_rwrh, MTD)
@@ -114,7 +113,7 @@ valid <- function(backprobability,lanbuda,yita,gamad1,gamat1) {
         u0 <- rep(1/length(u0),n)
         v0 <- rep(0, m)
         v0[which(colnames(AD1)==drugID)] <- 1
-        p0 <- c((1 - yita) * u0, yita * v0)
+        p0 <- c((1 - eta) * u0, eta * v0)
         p1 <- p0
         p <- (1 - backprobability) * t(M) %*% p1 + backprobability * p0
         while (max(abs(p - p1)) > 1e-10) {
@@ -162,4 +161,3 @@ valid <- function(backprobability,lanbuda,yita,gamad1,gamat1) {
   all<-list(rwrh=out_rwrh,nrwrh=out)
   return(all)
 }
-
