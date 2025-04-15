@@ -66,7 +66,7 @@ combinedsimilarity <- function(B, AD1, AT1, gamad1,gamat1,m, n) {
 
 #########For prediction#########
 #it calls the previously built function to generate network-based network
-nrwrhdrugtarget <- function(backprobability,lanbuda,yita,gamad1,gamat1,drugID) {
+nrwrhdrugtarget <- function(backprobability,lambda,eta,gamad1,gamat1,drugID) {
   # Load data
   B<-as.matrix(read.table("code/example/interaction.txt"))
   AT1 <- as.matrix(read.table("code/example/sequencesimilarity.txt"))
@@ -92,14 +92,14 @@ adj=as.data.frame(B)
   for (i in 1:n) {
     row_sum <- sum(B[i, ])
     if (row_sum != 0) {
-      MTD[i, ] <- lanbuda * B[i, ] / row_sum
+      MTD[i, ] <- lambda * B[i, ] / row_sum
     }
   }
   
   for (i in 1:m) {
     col_sum <- sum(B[, i])
     if (col_sum != 0) {
-      MDT[i, ] <- lanbuda * B[, i] / col_sum
+      MDT[i, ] <- lambda * B[, i] / col_sum
     }
   }
   
@@ -108,7 +108,7 @@ adj=as.data.frame(B)
     if (sum(B[i, ]) == 0 && row_sum != 0) {
       MT[i, ] <- AT[i, ] / row_sum
     } else if (row_sum != 0) {
-      MT[i, ] <- (1 - lanbuda) * AT[i, ] / row_sum
+      MT[i, ] <- (1 - lambda) * AT[i, ] / row_sum
     }
   }
   
@@ -117,7 +117,7 @@ adj=as.data.frame(B)
     if (sum(B[, i]) == 0 && row_sum != 0) {
       MD[i, ] <- AD[i, ] / row_sum
     } else if (row_sum != 0) {
-      MD[i, ] <- (1 - lanbuda) * AD[i, ] / row_sum
+      MD[i, ] <- (1 - lambda) * AD[i, ] / row_sum
     }
   }
   
@@ -131,7 +131,7 @@ adj=as.data.frame(B)
   v0 <- rep(0, m)
   v0[which(colnames(AD1)==drugID)] <- 1
 
-  p0 <- c((1 - yita) * u0, yita * v0)
+  p0 <- c((1 - eta) * u0, eta * v0)
   p1 <- p0
   p <- (1 - backprobability) * t(M) %*% p1 + backprobability * p0
   
